@@ -1,0 +1,51 @@
+================================================================
+TELEPÍTÉSI ÚTMUTATÓ - Dnn.Team5050.SuitCustomizer Modul
+================================================================
+
+A Dnn.Team5050.SuitCustomizer modul megfelelő telepítéséhez kövesse az alábbi lépéseket:
+
+1. RENDSZERKÖVETELMÉNYEK:
+   - DNN Platform 9.8.0 vagy újabb verzió
+   - .NET Framework 4.7.2 vagy újabb
+   - SQL Server 2012 vagy újabb
+
+2. TELEPÍTÉS LÉPÉSEI:
+   a) Jelentkezzen be a DNN oldal adminisztrációs felületére Host fiókkal.
+   b) Navigáljon a "Extensions > Install Extension" menüpontra.
+   c) Tallózza ki a "Dnn.Team5050.SuitCustomizer_00.00.01_Install.zip" fájlt.
+   d) Kattintson a "Install" gombra és várja meg a telepítés befejezését.
+   e) Ha a telepítés sikeres, megjelenik egy megerősítő üzenet.
+
+3. A MODUL HOZZÁADÁSA EGY OLDALHOZ:
+   a) Navigáljon arra az oldalra, ahol használni szeretné a modult.
+   b) Kapcsolja be a szerkesztési módot.
+   c) Adjon hozzá egy új modult: "Module > Add New Module".
+   d) Keresse meg a listában a "Dnn.Team5050.SuitCustomizer" modult és adja hozzá az oldalhoz.
+
+4. HIBAELHÁRÍTÁS:
+   Ha a "Dnn.Team5050.SuitCustomizer is currently unavailable" hibaüzenetet kapja:
+   
+   a) Ellenőrizze a DNN eseménynaplóit az "Admin > Event Viewer" menüpontban.
+   b) Törölje a gyorsítótárat a "Host > Settings > Clear Cache" opcióval.
+   c) Indítsa újra az alkalmazásmedencét (Application Pool) az IIS-ben.
+   d) Bizonyosodjon meg róla, hogy:
+      - A Resources mappa és annak alkönyvtárai helyesen kicsomagolódtak a
+        /DesktopModules/MVC/Dnn.Team5050.SuitCustomizer/ mappába
+      - A Dnn.Team5050.SuitCustomizer.dll megtalálható a /bin/ mappában
+      - A szükséges adatbázistáblák létrejöttek (ellenőrizze az SQL Server Management Studio-ban)
+
+5. ELTÁVOLÍTÁS:
+   a) Navigáljon a "Host > Extensions" menüpontra.
+   b) Keresse meg a "Dnn.Team5050.SuitCustomizer" modult a listában.
+   c) Kattintson az "Uninstall" opcióra.
+
+6. FONTOS MEGJEGYZÉSEK:
+   - A modul telepítéséhez Host szintű jogosultságokra van szükség.
+   - A telepítés létrehoz adatbázistáblákat, amelyek a SuitCustomizer_ előtaggal kezdődnek.
+   - A Resources mappában található anyagok és képek elengedhetetlenek a modul működéséhez.
+
+================================================================
+Készítette: Team5050
+Verzió: 00.00.01
+Dátum: 2025.05.06
+================================================================ 

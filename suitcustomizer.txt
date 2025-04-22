@@ -1,0 +1,75 @@
+Suit Customizer modul – Funkcionális specifikáció
+DNN Projekt, 2024. április
+
+1  Cél és hatókör
+A modul egy prémium kategóriás „Custom Suit” terméket tesz konfigurálhatóvá a DotNetNuke + Hotcakes működtette webshopban. A vásárló 30 féle anyag, 5 szabás, 4 zseb‑típus és 6 zsebkendő közül választhat, valós‑idejű előnézettel, majd a konfigurált öltönyt egyetlen termékként a kosárba helyezheti.
+A Hotcakes katalógusban mindössze egy alap termék (SKU: CUSTOMSUIT) szerepel; a modul ehhez hoz létre dinamikus Product Attribute‑eket.
+2  Felhasználói szerepek
+Szerep	Leírás
+Vásárló	Öltöny konfigurálása, kosárba helyezése, megjegyzés írása.
+Content Owner	UI‑mockupok, színpaletta és marketing szövegek biztosítása.
+Fejlesztő	Modul implementálása, verziókezelés és telepítés.
+
+3  Használati folyamat (happy path)
+1.	1. Az oldal betöltésekor az alap „Custom Suit” modell jelenik meg.
+2.	2. A felhasználó anyagot választ; a preview 300 ms‑on belül frissül.
+3.	3. A felhasználó stílust, zsebtípust, opcionális zsebkendőt választ.
+4.	4. A modul kiszámolja és HUF‑ban megjeleníti a végösszeget.
+5.	5. „Kosárba” – Hotcakes API hívás Product Attribute‑ekkel + megjegyzéssel.
+6.	6. A felhasználó folytatja a Hotcakes pénztárfolyamatot.
+4  Árazási logika
+Kategória	Részletek	Felár (HUF)
+Alap ár	Super 100’s gyapjú	169 900
+Anyag – Standard	15 féle	0
+Anyag – Luxury	10 féle (Super 130’s, merinó)	20 000
+Anyag – Exclusive	5 féle (kasmír, selyem‑blend)	40 000
+Szabás	Double‑breasted	8 000
+Zseb	Patched	4 000
+Zsebkendő	Selyem, 6 minta	3 900
+
+5  Funkcionális követelmények
+ID	Követelmény	Részletek
+F‑01	Anyaglista	30 kártya, keresőmező, görgethető grid
+F‑02	Preview	PNG rétegek összeillesztése canvas‑ban
+F‑03	Szabás‑választó	5 ikon, aktív állapot Secondary Blue
+F‑04	Zseb‑választó	4 ikon, Patched → zsebkendő elrejtése
+F‑05	Pocket Square	6 kép, +3 900 Ft
+F‑06	Ár‑kalkuláció	Felár‑mátrix, bruttó ár
+F‑07	Kosár	Hotcakes CartCreateItem API hívás
+F‑08	Megjegyzés	255 karakter textarea
+F‑09	Nyelv	Magyar UI, HUF formátum
+F‑10	Reszponzivitás	≥320 px, 3 breakpoint
+F‑11	Teljesítmény	LCP <2.5 s, opcióváltás <0.3 s
+
+6  Nem‑funkcionális követelmények
+⦁	Teljesítmény: client‑side kép‑rétegzés; HTTP/2; WebP fallback.
+⦁	Biztonság: Anti‑XSS, Anti‑CSRF token (DNN).
+⦁	Böngésző támogatás: Chrome 90+, Edge 90+, Firefox 88+, iOS Safari 14+, Android Chrome 90+.
+⦁	WCAG 2.1 AA megfelelőség.
+⦁	Backup: Git repo + Hotcakes DB nightly.
+7  Adatmodell (DAL2)
+Tábla	Fő mezők	Megjegyzés
+SuitConfiguration	ConfigId, UserId, FabricId, StyleId, PocketId, SquareId, Price, Note, CreatedOn	Kosár létrehozásakor beszúrva – analitika.
+Fabric	FabricId, Name, Category, HexColor, ThumbnailPath, IsActive	Fájl‑feltöltés + SQL insert elegendő.
+OptionStyle	StyleId, Name, ImagePath, ExtraPrice	5 rekord fix
+OptionPocket	PocketId, Name, ImagePath, ExtraPrice	4 rekord fix
+PocketSquare	SquareId, Name, ImagePath, ExtraPrice	6 rekord fix
+
+8  Git stratégia & CI
+Branch modell:
+• main – stabil, verziócímkézett
+• dev – napi munka, squash‑merge main‑re
+• hotfix/* – gyors javítás
+GitHub Actions pipeline: build (Debug + Release) → DNN install package artefact → opcionális FTP deploy.
+9  Mérföldkövek
+Milestone	Tartalom	Határidő
+M0	Bootstrap + repo	T+3 nap
+M1	Fabrics grid + preview	T+2 hét
+M2	Opciók & árazás	T+4 hét
+M3	Kosár‑integráció, DAL2	T+6 hét
+M4	UI‑polish, reszponzív	T+7 hét
+M5	UAT & élesítés	T+8 hét
+10  Nyitott kérdések
+• DNN és Hotcakes pontos verziószám (későbbre).
+• CI környezet – GitHub Actions megfelelő?
+• Böngésző‑támogatási lista bővítése szükséges?

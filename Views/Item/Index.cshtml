@@ -1,0 +1,1870 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<IEnumerable<SuitCustomizer.Dnn.Dnn.Team5050.SuitCustomizer.Models.Fabric>>
+
+@using SuitCustomizer.Dnn.Dnn.Team5050.SuitCustomizer.Models
+@using DotNetNuke.Web.Client.ClientResourceManagement
+
+@using System.Text.RegularExpressions
+@using DotNetNuke.Web.Mvc.Helpers
+
+@{
+    const string basePath = "~/DesktopModules/YourRFProject/module-suitcustomizer/" +
+                            "Dnn.Team5050.SuitCustomizer";
+
+    // Próbáljuk más módon betölteni a CSS-t
+    ClientResourceManager.RegisterStyleSheet(
+        Dnn.DnnPage,
+        basePath + "/module.css", 100);
+
+    // jQuery biztosítása
+    ClientResourceManager.RegisterScript(Dnn.DnnPage, "~/Resources/Shared/Scripts/jquery/jquery.min.js", 1);
+    
+    // Közvetlen stílus a teszteléshez, ha a fájl nem töltődne be
+    <style>
+        /* ---- Suit Customizer stílusok a specifikáció szerint ---- */
+        :root {
+            --primary-text: #1C1C1C;
+            --primary-grey: #E4E6E8;
+            --secondary-blue: #0066CC;
+            --accent-orange: #FF7A00;
+            --accent-orange-dark: #E06700;
+            --page-bg: #F7F7F7;
+            --white: #FFFFFF;
+            --grey-500: #8A8D90;
+            --grey-600: #8A8D90;
+        }
+
+        /* Globális reset és alapstílusok */
+        .sc-container * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .sc-container {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--primary-text);
+            position: relative;
+            background-color: var(--white);
+            max-width: 100%;
+            margin: 0 auto;
+            height: 97vh; /* 5%-kal növelt magasság */
+            max-height: 840px; /* 5%-kal növelt maximum magasság */
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            border-radius: 8px;
+        }
+
+        /* 1. Bal oldalpanel */
+        .sc-left-panel {
+            width: 380px;
+            flex-shrink: 0;
+            background-color: var(--white);
+            border-right: 1px solid var(--primary-grey);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 97vh; /* 5%-kal növelt magasság */
+            max-height: 840px;
+            position: relative;
+        }
+
+        /* Fejlécsáv */
+        .sc-header {
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            border-bottom: 1px solid var(--primary-grey);
+            background-color: var(--white);
+        }
+
+        .sc-logo {
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .sc-icons {
+            display: flex;
+            gap: 16px;
+        }
+
+        .sc-icon {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        /* Kereső mező */
+        .sc-search-filter {
+            padding: 12px 16px;
+            background-color: var(--white);
+            z-index: 10;
+            border-bottom: 1px solid var(--primary-grey);
+            position: relative;
+        }
+
+        .sc-search {
+            width: 100%;
+            height: 38px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 0 12px;
+            font-size: 13px;
+            color: var(--primary-text);
+            background-color: #f9f9f9;
+            transition: border-color 0.15s;
+        }
+
+        .sc-search:focus {
+            outline: none;
+            border-color: #ccc;
+        }
+
+        .sc-search::placeholder {
+            color: #999;
+            font-size: 13px;
+        }
+
+        .sc-filter-btn {
+            position: absolute;
+            right: 16px;
+            top: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            color: #666;
+            padding: 8px 6px;
+        }
+
+        .sc-filter-btn:hover {
+            color: #333;
+        }
+        
+        .sc-filter-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* Tab navigation */
+        .sc-config-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--primary-grey);
+            background: var(--white);
+        }
+
+        .sc-tab {
+            padding: 14px 0;
+            cursor: pointer;
+            font-weight: 500;
+            text-align: center;
+            flex: 1;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 14px;
+        }
+
+        .sc-tab:hover {
+            background-color: var(--page-bg);
+        }
+
+        .sc-tab.active {
+            border-bottom-color: var(--secondary-blue);
+        }
+
+        .sc-tab-icon {
+            display: block;
+            height: 24px;
+            width: 24px;
+            color: var(--primary-text);
+            margin-bottom: 3px;
+        }
+
+        /* Tab tartalmak */
+        .sc-tab-content {
+            display: none;
+            height: calc(97vh - 113px);
+            max-height: calc(840px - 113px);
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        .sc-tab-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sc-tab-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .sc-tab-content::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 3px;
+        }
+
+        .sc-tab-content.active {
+            display: block;
+        }
+
+        .sc-tab-content h3 {
+            font-size: 15px;
+            font-weight: 600;
+            margin: 16px 16px 16px 16px;
+            color: var(--primary-text);
+        }
+
+        /* Anyag és stílus kártyák */
+        .sc-fabric-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            overflow-y: auto;
+            padding: 0 16px 16px 16px;
+        }
+        
+        .sc-fabric-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.12s, box-shadow 0.12s;
+            margin: 0;
+            background-color: var(--white);
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+        
+        .sc-fabric-card.is-active {
+            border-color: var(--secondary-blue);
+            box-shadow: 0 0 0 2px var(--secondary-blue);
+        }
+        
+        .sc-fabric-card:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .sc-fabric-card img {
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .sc-fabric-card figcaption {
+            padding: 8px 10px 2px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--primary-text);
+        }
+        
+        .sc-fabric-details {
+            padding: 0 10px 4px;
+            font-size: 11px;
+            color: var(--grey-600);
+        }
+        
+        .sc-fabric-price {
+            padding: 0 10px 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--primary-text);
+        }
+
+        .sc-style-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            padding: 0 16px 16px 16px;
+        }
+
+        .sc-style-option {
+            border: 1px solid var(--primary-grey);
+            border-radius: 6px;
+            cursor: pointer;
+            background: var(--white);
+            transition: all 0.15s ease;
+            text-align: center;
+            font-size: 13px;
+            padding: 12px 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+        }
+
+        .sc-style-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+
+        .sc-style-option.is-active {
+            border-color: var(--secondary-blue);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background-color: rgba(0, 102, 204, 0.03);
+        }
+
+        .sc-style-option .style-icon {
+            height: 70px;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .style-icon img {
+            max-height: 70px;
+            max-width: 100%;
+            object-fit: contain;
+            background-color: transparent; /* Átlátszó háttér */
+            mix-blend-mode: multiply; /* A háttér kezelése */
+            border-radius: 4px; /* Lekerekített sarkok az illeszkedéshez */
+        }
+
+        .sc-style-option.is-active .style-icon img {
+            /* Aktív állapotban az ikon háttere egyezzen az aktív gomb háttérszínével */
+            background-color: rgba(0, 102, 204, 0.03);
+        }
+
+        /* Zsebkendő opciók */
+        .sc-handkerchief-section {
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid var(--primary-grey);
+            padding-left: 16px;
+            padding-right: 16px;
+        }
+
+        .sc-handkerchief-options {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .sc-handkerchief-option {
+            border: 1px solid var(--primary-grey);
+            border-radius: 6px;
+            padding: 12px 16px;
+            cursor: pointer;
+            background: var(--white);
+            transition: all 0.15s ease;
+            flex: 1;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .sc-handkerchief-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+
+        .sc-handkerchief-option.is-active {
+            border-color: var(--secondary-blue);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background-color: rgba(0, 102, 204, 0.03);
+        }
+
+        /* Zseb opciók */
+        .sc-pocket-options {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .sc-pocket-option {
+            padding: 10px 15px;
+            border-radius: 4px;
+            background-color: #F5F7F9;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #E4E6E8;
+            flex: 1;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .sc-pocket-option:hover {
+            background-color: #EDF0F5;
+        }
+
+        .sc-pocket-option.is-active {
+            background-color: #EDF0F5;
+            border-color: #0066CC;
+            box-shadow: 0 0 0 1px #0066CC;
+        }
+
+        .pocket-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .sc-price-tag {
+            display: block;
+            font-size: 12px;
+            color: var(--accent-orange);
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .sc-handkerchief-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .sc-handkerchief-grid.hidden {
+            display: none;
+        }
+
+        .sc-handkerchief-card {
+            border: 1px solid var(--primary-grey);
+            border-radius: 4px;
+            cursor: pointer;
+            background: var(--white);
+            transition: all 0.15s ease;
+            text-align: center;
+            font-size: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sc-handkerchief-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+
+        .sc-handkerchief-card.is-active {
+            border-color: var(--secondary-blue);
+            box-shadow: 0 0 0 2px var(--secondary-blue);
+        }
+
+        .sc-handkerchief-card img {
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            display: block;
+        }
+
+        .sc-handkerchief-card figcaption {
+            padding: 8px 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 12px;
+            line-height: 1.3;
+        }
+
+        /* 2. Központi előnézet */
+        .sc-preview-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--page-bg);
+            padding: 0;
+            position: relative;
+            height: 97vh; /* 5%-kal növelt magasság */
+            max-height: 840px;
+            overflow: hidden;
+        }
+
+        .sc-preview {
+            width: 100%; 
+            max-width: none;
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .sc-stack {
+            position: relative;
+            width: 55%;
+            max-height: 80vh;
+            margin: 0 auto; 
+            transition: transform 0.2s;
+            transform-origin: center 20%;
+            transform: translateY(5%) scale(0.9); /* 25%-kal lejjebb vittük az öltönyt (-20% → +5%) */
+        }
+
+        .sc-stack img {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: auto;
+            pointer-events: none;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+
+        .sc-zoom-controls {
+            position: absolute;
+            right: 24px;
+            bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sc-zoom-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--white);
+            border: 1px solid var(--primary-grey);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--secondary-blue);
+            font-size: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            transition: all 0.2s ease;
+        }
+
+        .sc-zoom-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            background-color: var(--secondary-blue);
+            color: var(--white);
+        }
+
+        /* Töltőikon a képhez */
+        .sc-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .sc-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #eee;
+            border-radius: 50%;
+            border-top-color: var(--secondary-blue);
+            animation: spin 1s linear infinite;
+        }
+
+        @@keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 3. Jobb oldalsáv */
+        .sc-right-panel {
+            width: 280px;
+            flex-shrink: 0;
+            padding: 32px 24px 24px;
+            display: flex;
+            flex-direction: column;
+            height: 97vh; /* 5%-kal növelt magasság */
+            max-height: 840px;
+            overflow: auto;
+            border-left: 1px solid var(--primary-grey);
+            background-color: var(--white);
+        }
+
+        .sc-product-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-text);
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .sc-product-description {
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--grey-600);
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--primary-grey);
+        }
+
+        .sc-right-top {
+            flex: 1;
+        }
+
+        .sc-right-bottom {
+            margin-top: auto;
+        }
+
+        .sc-price-container {
+            background: var(--page-bg);
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .sc-price-label {
+            font-size: 12px;
+            color: var(--grey-600);
+            margin-bottom: 4px;
+        }
+
+        .sc-price {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--primary-text);
+        }
+
+        .sc-price-vat {
+            font-size: 11px;
+            color: var(--grey-600);
+            margin-top: 2px;
+        }
+
+        .sc-next-btn {
+            background-color: var(--accent-orange);
+            color: var(--white);
+            border: none;
+            padding: 0 24px;
+            height: 60px; /* Magasabb gomb */
+            font-size: 18px; /* Nagyobb betűméret */
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            margin: 0 0 24px 0;
+            box-shadow: 0 4px 12px rgba(255, 122, 0, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sc-next-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.2), rgba(255,255,255,0));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .sc-next-btn:hover {
+            background-color: var(--accent-orange-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(255, 122, 0, 0.35);
+        }
+
+        .sc-next-btn:hover::before {
+            opacity: 1;
+        }
+
+        .sc-next-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(255, 122, 0, 0.2);
+        }
+
+        .sc-next-btn svg {
+            width: 20px;
+            height: 20px;
+            margin-left: 8px;
+        }
+        
+        @@media screen and (max-width: 767px) {
+            .sc-next-btn {
+                height: 54px;
+                font-size: 16px;
+            }
+        }
+
+        .sc-guarantee {
+            display: flex;
+            flex-wrap: wrap;
+            column-gap: 24px;
+            row-gap: 8px;
+            font-size: 13px;
+            color: var(--grey-600);
+        }
+
+        .sc-guarantee p {
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .sc-guarantee p::before {
+            content: "✓";
+            color: var(--secondary-blue);
+            font-weight: bold;
+            margin-right: 6px;
+        }
+
+        .sc-selection-summary {
+            margin: 16px 0;
+        }
+
+        .sc-selection-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--primary-text);
+        }
+
+        .sc-selection-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 13px;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .sc-selection-label {
+            color: var(--grey-600);
+        }
+
+        .sc-selection-value {
+            font-weight: 500;
+            color: var(--primary-text);
+        }
+        
+        /* Reszponzív szabályok igazítása */
+        @@media screen and (max-width: 767px) {
+            .sc-container {
+                height: auto;
+                max-height: none;
+            }
+            
+            .sc-preview-container {
+                height: 50vh;
+                max-height: 500px;
+            }
+            
+            .sc-right-panel {
+                height: auto;
+                max-height: none;
+                padding: 24px 16px;
+            }
+        }
+
+        /* Stílusikonok */
+        .style-sb1 {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M30,20 L70,20 C75,20 80,25 80,30 L80,80 L60,80 L60,50 C60,45 55,40 50,40 C45,40 40,45 40,50 L40,80 L20,80 L20,30 C20,25 25,20 30,20 Z' stroke='%23333' stroke-width='2' fill='none'/%3E%3Ccircle cx='50' cy='50' r='3' fill='%23333'/%3E%3C/svg%3E");
+        }
+        
+        .style-sb2 {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M30,20 L70,20 C75,20 80,25 80,30 L80,80 L60,80 L60,50 C60,45 55,40 50,40 C45,40 40,45 40,50 L40,80 L20,80 L20,30 C20,25 25,20 30,20 Z' stroke='%23333' stroke-width='2' fill='none'/%3E%3Ccircle cx='50' cy='45' r='3' fill='%23333'/%3E%3Ccircle cx='50' cy='55' r='3' fill='%23333'/%3E%3C/svg%3E");
+        }
+        
+        .style-db4 {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M30,20 L70,20 C75,20 80,25 80,30 L80,80 L60,80 L60,50 C60,45 55,40 50,40 C45,40 40,45 40,50 L40,80 L20,80 L20,30 C20,25 25,20 30,20 Z' stroke='%23333' stroke-width='2' fill='none'/%3E%3Cpath d='M45,40 L65,40 C70,40 75,45 75,50 L75,80' stroke='%23333' stroke-width='2' fill='none' stroke-dasharray='3,3'/%3E%3Ccircle cx='40' cy='40' r='2.5' fill='%23333'/%3E%3Ccircle cx='40' cy='50' r='2.5' fill='%23333'/%3E%3Ccircle cx='60' cy='40' r='2.5' fill='%23333'/%3E%3Ccircle cx='60' cy='50' r='2.5' fill='%23333'/%3E%3C/svg%3E");
+        }
+        
+        .style-db6 {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M30,20 L70,20 C75,20 80,25 80,30 L80,80 L60,80 L60,50 C60,45 55,40 50,40 C45,40 40,45 40,50 L40,80 L20,80 L20,30 C20,25 25,20 30,20 Z' stroke='%23333' stroke-width='2' fill='none'/%3E%3Cpath d='M45,40 L65,40 C70,40 75,45 75,50 L75,80' stroke='%23333' stroke-width='2' fill='none' stroke-dasharray='3,3'/%3E%3Ccircle cx='40' cy='35' r='2' fill='%23333'/%3E%3Ccircle cx='40' cy='45' r='2' fill='%23333'/%3E%3Ccircle cx='40' cy='55' r='2' fill='%23333'/%3E%3Ccircle cx='60' cy='35' r='2' fill='%23333'/%3E%3Ccircle cx='60' cy='45' r='2' fill='%23333'/%3E%3Ccircle cx='60' cy='55' r='2' fill='%23333'/%3E%3C/svg%3E");
+        }
+        
+        .style-mao {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M25,20 L75,20 C75,20 75,25 50,25 C25,25 25,20 25,20 Z' stroke='%23333' stroke-width='2' fill='none'/%3E%3Cpath d='M30,20 L70,20 L70,80 L30,80 L30,20 Z' stroke='%23333' stroke-width='2' fill='none'/%3E%3Ccircle cx='50' cy='40' r='2.5' fill='%23333'/%3E%3Ccircle cx='50' cy='50' r='2.5' fill='%23333'/%3E%3C/svg%3E");
+        }
+
+        .sc-style-option .style-icon {
+            height: 70px;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .style-icon img {
+            max-height: 70px;
+            max-width: 100%;
+            object-fit: contain;
+            background-color: transparent; /* Átlátszó háttér */
+            mix-blend-mode: multiply; /* A háttér kezelése */
+            border-radius: 4px; /* Lekerekített sarkok az illeszkedéshez */
+        }
+        
+        .style-name {
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 2px;
+        }
+        
+        .style-details {
+            font-size: 12px;
+            color: var(--grey-600);
+        }
+        
+        /* Új stílusok a garancia információkhoz */
+        .sc-guarantees {
+            border-top: 1px solid #eee;
+            padding-top: 12px;
+            margin-top: 8px;
+        }
+        
+        .sc-guarantee-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            color: #666;
+            font-size: 12px;
+        }
+        
+        .sc-guarantee-item svg {
+            color: var(--secondary-blue);
+            flex-shrink: 0;
+        }
+
+        /* Hátoldali szellőző opciók */
+        .sc-vent-options {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .sc-vent-option {
+            padding: 10px 15px;
+            border-radius: 4px;
+            background-color: #F5F7F9;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #E4E6E8;
+            flex: 1;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .sc-vent-option:hover {
+            background-color: #EDF0F5;
+        }
+
+        .sc-vent-option.is-active {
+            background-color: #EDF0F5;
+            border-color: #0066CC;
+            box-shadow: 0 0 0 1px #0066CC;
+        }
+
+        .vent-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        /* Nézet váltó gomb */
+        .sc-view-toggle {
+            position: absolute;
+            left: 50%;
+            bottom: 20px;
+            transform: translateX(-50%);
+            background-color: var(--white);
+            border: 1px solid var(--primary-grey);
+            border-radius: 30px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 14px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            cursor: pointer;
+            z-index: 1000;
+            color: var(--primary-text);
+            transition: all 0.2s ease;
+        }
+
+        .sc-view-toggle:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transform: translateX(-50%) translateY(-2px);
+        }
+
+        .sc-view-toggle span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            padding: 4px 12px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .sc-view-toggle span.is-active {
+            background-color: var(--secondary-blue);
+            color: var(--white);
+        }
+    </style>
+    
+    // Viewport beállítás a reszponzív megjelenéshez
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+}
+
+<!-- Suit customizer container start -->
+<div class="sc-container">
+    <!-- 1. Bal oldalpanel -->
+    <div class="sc-left-panel">
+        <!-- Fejlécsáv -->
+        <div class="sc-header">
+            <div class="sc-logo">ÖLTÖNY TESTRESZABÁS</div>
+        </div>
+        
+        <!-- Kereső mező -->
+        <div class="sc-search-filter">
+            <input type="text" class="sc-search" placeholder="Keresés anyag név vagy tulajdonság szerint">
+            <button type="button" class="sc-filter-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Szűrők
+            </button>
+        </div>
+        
+        <!-- Konfiguráció fül választó -->
+        <div class="sc-config-tabs">
+            <div class="sc-tab active" data-tab="fabric">
+                <svg class="sc-tab-icon" viewBox="0 0 100 100">
+                    <defs><style>.cls-1,.cls-3,.cls-4{fill:none;}.cls-2{clip-path:url(#clip-path);}.cls-3,.cls-4{stroke:#000;stroke-miterlimit:10;}.cls-4{stroke-width:3px;}</style><clipPath id="clip-path"><polygon class="cls-1" points="50.75 88.88 44.13 82.26 36.68 88.88 30.06 82.06 22.4 88.88 5.85 72.13 12.96 65.05 5.85 57.23 12.89 50.2 5.85 43.16 12.68 35.3 5.85 28.27 22.4 11.51 30.06 18.34 36.68 11.51 44.13 18.13 50.95 11.72 57.37 18.13 64.81 11.51 71.43 18.34 79.09 11.51 95.64 28.27 88.81 35.3 95.64 43.16 88.6 50.2 95.64 57.23 88.53 65.05 95.64 72.13 79.09 88.88 71.43 82.06 64.81 88.88 57.37 82.26 50.75 88.88"/></clipPath></defs>
+                    <g class="cls-2"><line class="cls-3" x1="57.17" y1="-22.85" x2="-24.64" y2="58.97"/><line class="cls-3" x1="60.87" y1="-19.15" x2="-20.95" y2="62.67"/><line class="cls-3" x1="64.57" y1="-15.45" x2="-17.25" y2="66.36"/><line class="cls-3" x1="68.26" y1="-11.76" x2="-13.55" y2="70.06"/><line class="cls-3" x1="71.96" y1="-8.06" x2="-9.86" y2="73.76"/><line class="cls-3" x1="75.66" y1="-4.36" x2="-6.16" y2="77.45"/><line class="cls-3" x1="79.36" y1="-0.67" x2="-2.46" y2="81.15"/><line class="cls-3" x1="83.05" y1="3.03" x2="1.24" y2="84.85"/><line class="cls-3" x1="86.75" y1="6.73" x2="4.93" y2="88.54"/><line class="cls-3" x1="90.45" y1="10.42" x2="8.63" y2="92.24"/><line class="cls-3" x1="94.14" y1="14.12" x2="12.33" y2="95.94"/><line class="cls-3" x1="97.84" y1="17.82" x2="16.02" y2="99.64"/><line class="cls-3" x1="101.54" y1="21.52" x2="19.72" y2="103.33"/><line class="cls-3" x1="105.23" y1="25.21" x2="23.42" y2="107.03"/><line class="cls-3" x1="108.93" y1="28.91" x2="27.11" y2="110.73"/><line class="cls-3" x1="112.63" y1="32.61" x2="30.81" y2="114.42"/><line class="cls-3" x1="116.32" y1="36.3" x2="34.51" y2="118.12"/><line class="cls-3" x1="120.02" y1="40" x2="38.21" y2="121.82"/></g>
+                    <polygon class="cls-4" points="50.75 88.88 44.13 82.26 36.68 88.88 30.06 82.06 22.4 88.88 5.85 72.13 12.96 65.05 5.85 57.23 12.89 50.2 5.85 43.16 12.68 35.3 5.85 28.27 22.4 11.51 30.06 18.34 36.68 11.51 44.13 18.13 50.95 11.72 57.37 18.13 64.81 11.51 71.43 18.34 79.09 11.51 95.64 28.27 88.81 35.3 95.64 43.16 88.6 50.2 95.64 57.23 88.53 65.05 95.64 72.13 79.09 88.88 71.43 82.06 64.81 88.88 57.37 82.26 50.75 88.88"/>
+                </svg>
+                Anyag
+            </div>
+            <div class="sc-tab" data-tab="style">
+                <svg class="sc-tab-icon" viewBox="0 0 100 100">
+                    <path d="M6.12,80.06a10.49,10.49,0,0,0,1.47,5.39,10.69,10.69,0,0,0,3.92,4.17,11.54,11.54,0,0,0,11.27,0l12-7.11a10.92,10.92,0,0,0,0-19.12,7.34,7.34,0,0,0-2.45-1l1-.74c.25,0,.25,0,.49-.25l6.86-3.92L79.88,80.3a1.56,1.56,0,0,0,1.47,0L94.1,76.87a1.6,1.6,0,0,0,.49-2.94L53.42,50.16,94.59,26.39a1.6,1.6,0,0,0-.49-2.94L81.35,20a1.56,1.56,0,0,0-1.47,0L40.67,42.81l-6.86-3.92c-.25-.25-.25-.25-.49-.25l-13-7.6c.74-.25,1.72-.74,2.45-1A10.69,10.69,0,0,0,26.7,25.9a11.38,11.38,0,0,0,1.47-5.64,10.9,10.9,0,0,0-5.39-9.56,11.54,11.54,0,0,0-11.27,0,11.44,11.44,0,0,0-5.39,9.56,10.9,10.9,0,0,0,5.39,9.56v.25L31.36,41.34l4.41,8.82L31.36,59l-7.6,4.41L11.51,70.25A11.3,11.3,0,0,0,6.12,80.06Zm3.43,0a7.42,7.42,0,0,1,3.68-6.62l12.25-7.11a7.09,7.09,0,0,1,7.6,0,7.54,7.54,0,0,1,0,13.23l-12,7.11a8.82,8.82,0,0,1-7.84,0,10.45,10.45,0,0,1-2.7-2.94A6.38,6.38,0,0,1,9.55,80.06Zm0-59.8a8,8,0,0,1,3.68-6.62,8.82,8.82,0,0,1,7.84,0,8,8,0,0,1,3.68,6.62,7.19,7.19,0,0,1-1,3.92,5.75,5.75,0,0,1-2.7,2.7,7.52,7.52,0,0,1-7.84,0A7.42,7.42,0,0,1,9.55,20.26Zm28.92,29.9a3.35,3.35,0,0,1,3.43-3.43,3.43,3.43,0,1,1,0,6.86A3.35,3.35,0,0,1,38.47,50.16Zm5.64,5.39L50,52.12,89.2,74.67l-8.09,2.21Zm0-10.78,37-21.32,8.09,2.21L50,48.2Z"/>
+                </svg>
+                Stílus
+            </div>
+        </div>
+        
+        <!-- Anyag választó fül tartalma -->
+        <div class="sc-tab-content active" id="fabric-content">
+            <h3>Válassz anyagot</h3>
+            <div class="sc-fabric-grid" id="fabric-grid">
+                <!-- Az anyag kártyák itt jelennek meg dinamikusan -->
+            </div>
+        </div>
+        
+        <!-- Stílus választó fül tartalma -->
+        <div class="sc-tab-content" id="style-content">
+            <h3>Válassz stílust</h3>
+        <div class="sc-style-grid">
+            <div class="sc-style-option is-active" data-style="SB1">
+                <div class="style-icon">
+                    <img src="@Url.Content(basePath)/Resources/icons/1button.png" alt="Egysoros 1 gombos" />
+                </div>
+                <div class="style-name">Egysoros</div>
+                <div class="style-details">1 gombos</div>
+            </div>
+            <div class="sc-style-option" data-style="SB2">
+                <div class="style-icon">
+                    <img src="@Url.Content(basePath)/Resources/icons/2button.png" alt="Egysoros 2 gombos" />
+                </div>
+                <div class="style-name">Egysoros</div>
+                <div class="style-details">2 gombos</div>
+            </div>
+            <div class="sc-style-option" data-style="DB4">
+                <div class="style-icon">
+                    <img src="@Url.Content(basePath)/Resources/icons/4-button.png" alt="Kétsoros 4 gombos" />
+                </div>
+                <div class="style-name">Kétsoros</div>
+                <div class="style-details">4 gombos</div>
+            </div>
+            <div class="sc-style-option" data-style="DB6">
+                <div class="style-icon">
+                    <img src="@Url.Content(basePath)/Resources/icons/6-button.png" alt="Kétsoros 6 gombos" />
+                </div>
+                <div class="style-name">Kétsoros</div>
+                <div class="style-details">6 gombos</div>
+            </div>
+            <div class="sc-style-option" data-style="MAO">
+                <div class="style-icon">
+                    <img src="@Url.Content(basePath)/Resources/icons/mao.png" alt="Mao gallér" />
+                </div>
+                <div class="style-name">Mao gallér</div>
+                <div class="style-details">2 gombos</div>
+            </div>
+        </div>
+            
+            <!-- Zsebkendő opciók szekció -->
+            <div class="sc-handkerchief-section">
+                <h3>Zseb típus</h3>
+                <div class="sc-pocket-options">
+                    <div class="sc-pocket-option is-active" data-pocket="flap">
+                        <div class="pocket-name">Fedeles zseb</div>
+                    </div>
+                    <div class="sc-pocket-option" data-pocket="patched">
+                        <div class="pocket-name">Rátett zseb</div>
+                    </div>
+                    <div class="sc-pocket-option" data-pocket="double_welt">
+                        <div class="pocket-name">Dupla paspolos zseb</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hátoldali szellőző opciók -->
+            <div class="sc-handkerchief-section">
+                <h3>Szellőző típus</h3>
+                <div class="sc-vent-options">
+                    <div class="sc-vent-option is-active" data-vent="center">
+                        <div class="vent-name">Közép szellőző</div>
+                    </div>
+                    <div class="sc-vent-option" data-vent="side">
+                        <div class="vent-name">Oldal szellőző</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Zsebkendő opciók szekció -->
+            <div class="sc-handkerchief-section">
+                <h3>Kendő</h3>
+                <div class="sc-handkerchief-options">
+                    <div class="sc-handkerchief-option is-active" data-value="no">Nem kérek</div>
+                    <div class="sc-handkerchief-option" data-value="yes">Kérek <span class="sc-price-tag">(+4000 Ft)</span></div>
+                </div>
+                <div class="sc-handkerchief-grid hidden" id="handkerchief-grid">
+                    <!-- A zsebkendő opciók itt jelennek meg dinamikusan -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 2. Központi előnézet -->
+    <div class="sc-preview-container">
+        <div class="sc-preview">
+            <div class="sc-stack" data-scale="1">
+                <!-- Öltöny rétegek itt jelennek meg -->
+            </div>
+        </div>
+        
+        <!-- Nagyítás/kicsinyítés vezérlők -->
+        <div class="sc-zoom-controls">
+            <button type="button" class="sc-zoom-btn" data-zoom="in">+</button>
+            <button type="button" class="sc-zoom-btn" data-zoom="out">−</button>
+        </div>
+        
+        <!-- Nézet váltó gomb -->
+        <div class="sc-view-toggle">
+            <span class="is-active" data-view="front">Elölnézet</span>
+            <span data-view="back">Hátulnézet</span>
+        </div>
+        
+        <!-- Betöltés indikátor -->
+        <div class="sc-loading" style="display: none;">
+            <div class="sc-spinner"></div>
+            <div style="margin-top: 10px;">Betöltés...</div>
+        </div>
+    </div>
+    
+    <!-- 3. Jobb oldalsáv -->
+    <div class="sc-right-panel">
+        <!-- Felső rész: Termékinformációk -->
+        <div class="sc-right-top">
+            <h1 class="sc-product-title">Testreszabott öltöny</h1>
+            <p class="sc-product-description">
+                Válassz anyagot és stílust az öltönyödhöz, hogy tökéletesen illeszkedjen az igényeidhez.
+                Mindegyik öltönyt kézzel készítünk a méreted alapján.
+            </p>
+            
+            <!-- Kiválasztott beállítások összegzése -->
+            <div class="sc-selection-summary">
+                <div class="sc-selection-title">Kiválasztott opciók</div>
+                <div class="sc-selection-item">
+                    <span class="sc-selection-label">Anyag:</span>
+                    <span class="sc-selection-value" id="selected-fabric">Nincs kiválasztva</span>
+                </div>
+                <div class="sc-selection-item">
+                    <span class="sc-selection-label">Stílus:</span>
+                    <span class="sc-selection-value" id="selected-style">Egysoros (1 gombos)</span>
+                </div>
+                <div class="sc-selection-item">
+                    <span class="sc-selection-label">Kendő:</span>
+                    <span class="sc-selection-value" id="selected-handkerchief">Nincs</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Alsó rész: Ár és rendelés -->
+        <div class="sc-right-bottom">
+            <div class="sc-price-container">
+                <div class="sc-price-label">Végösszeg:</div>
+                <div class="sc-price">87600 Ft</div>
+                <div class="sc-price-vat">Az ár tartalmazza az ÁFÁ-t</div>
+            </div>
+            
+            <button type="button" class="sc-next-btn">
+                Kosárba teszem
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="9" cy="21" r="1"></circle>
+                    <circle cx="20" cy="21" r="1"></circle>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+            </button>
+            
+            <!-- Garanciák eltávolítva a felhasználó kérésére -->
+        </div>
+    </div>
+</div>
+
+<!-- Rejtett köztes elem a + jeles képnevekhez -->
+<div id="image-data" style="display:none;" 
+     data-base-path="@Url.Content(basePath)">
+</div>
+
+<script>
+    $(document).ready(function() {
+        console.clear();
+        console.log("SUIT-CUSTOMIZER betöltve");
+        
+        // Töltési állapot
+        function showLoading() {
+            $(".sc-loading").show();
+        }
+        
+        function hideLoading() {
+            $(".sc-loading").hide();
+        }
+        
+        // Alapértelmezetten rejtett stack
+        $(".sc-stack").css("visibility", "hidden");
+        
+        // Mobil menü kezelése
+        $(".sc-hamburger").on("click", function() {
+            $(".sc-left-panel").toggleClass("active");
+        });
+        
+        // Tab váltás kezelése
+        $(".sc-tab").on("click", function() {
+            var tabId = $(this).data("tab");
+            
+            // Aktív fül stílus váltása
+            $(".sc-tab").removeClass("active");
+            $(this).addClass("active");
+            
+            // Fül tartalom váltása
+            $(".sc-tab-content").removeClass("active");
+            $("#" + tabId + "-content").addClass("active");
+        });
+        
+        // Zoom vezérlők
+        let zoomLevel = 0.9; // Alapértelmezett méret 10%-kal kisebb
+        $(".sc-zoom-btn").on("click", function(e) {
+            e.preventDefault(); // Megakadályozzuk az oldal újratöltését
+            const isZoomIn = $(this).data("zoom") === "in";
+            if (isZoomIn) {
+                zoomLevel = Math.min(zoomLevel + 0.2, 1.8);
+            } else {
+                zoomLevel = Math.max(zoomLevel - 0.2, 0.5);
+            }
+            $(".sc-stack").css("transform", `translateY(5%) scale(${zoomLevel})`);
+        });
+        
+        // Öltöny stílusok és a hozzájuk tartozó fájlminták - ALTERNATÍV NEVEK
+        var SUIT_STYLES = {
+            // Single-breasted 1 button
+            "SB1": {
+                neck: "neck_single_breasted_buttons_1_lapel_medium_style_lapel_notch.png",
+                bottom: "bottom_single_breasted_length_long_hemline_open.png",
+                breast_pocket: "breast_pocket_classic.png"
+            },
+            // Single-breasted 2 buttons
+            "SB2": {
+                neck: "neck_single_breasted_buttons_2_lapel_medium_style_lapel_notch.png",
+                bottom: "bottom_single_breasted_length_long_hemline_open.png",
+                breast_pocket: "breast_pocket_classic.png"
+            },
+            // Double-breasted 4 buttons
+            "DB4": {
+                neck: "neck_double_breasted_buttons_4_lapel_wide_style_lapel_notch.png",
+                bottom: "bottom_double_breasted_length_long.png",
+                breast_pocket: "breast_pocket_classic.png"
+            },
+            // Double-breasted 6 buttons
+            "DB6": {
+                neck: "neck_double_breasted_buttons_6_lapel_wide_style_lapel_notch.png",
+                bottom: "bottom_double_breasted_length_long.png",
+                breast_pocket: "breast_pocket_classic.png"
+            },
+            // Mandarin
+            "MAO": {
+                neck: "neck_mao.png",
+                bottom: "bottom_mao_length_long.png",
+                breast_pocket: "breast_pocket_classic.png"
+            }
+        };
+        
+        // Eredeti fájlnevekkel való megfeleltetés (a szerveren ezek vannak)
+        var FILE_MAPPINGS = {
+            // Stílus specifikus fájlok
+            "neck_single_breasted_buttons_1_lapel_medium_style_lapel_notch.png": "neck_single_breasted-buttons_1-lapel_medium-style_lapel_notch.png",
+            "neck_single_breasted_buttons_2_lapel_medium_style_lapel_notch.png": "neck_single_breasted-buttons_2-lapel_medium-style_lapel_notch.png",
+            "neck_double_breasted_buttons_4_lapel_wide_style_lapel_notch.png": "neck_double_breasted-buttons_4-lapel_wide-style_lapel_notch.png",
+            "neck_double_breasted_buttons_6_lapel_wide_style_lapel_notch.png": "neck_double_breasted-buttons_6-lapel_wide-style_lapel_notch.png",
+            "bottom_single_breasted_length_long_hemline_open.png": "bottom_single_breasted-length_long-hemline_open.png",
+            "bottom_double_breasted_length_long.png": "bottom_double_breasted-length_long.png",
+            "bottom_mao_length_long.png": "bottom_mao-length_long.png",
+            
+            // Közös fájlok
+            "hip_pocket.png": "hip_pockets_with_flap-fit_slim.png",
+            "interior_espalda_abajo.png": "interior-espalda_abajo-length_long.png", 
+            "interior_espalda_arriba.png": "interior-espalda_arriba.png",
+            "interior_espalda_arriba_mao.png": "interior-espalda_arriba_mao.png",
+            "interior_sleeves.png": "interior-sleeves.png"
+        };
+        
+        // Fix hip pocket alternatív neve
+        var HIP_POCKET = "hip_pocket.png";
+        
+        // Zseb típusok
+        var POCKET_TYPES = {
+            "flap": "hip_pockets_with_flap-fit_slim.png",
+            "patched": "hip_pockets_patched-fit_slim.png",
+            "double_welt": "hip_pockets_double_welt-fit_slim.png"
+        };
+        
+        // Szellőző típusok
+        var VENT_TYPES = {
+            "center": "bottom-length_long-back_style_center_vent.png",
+            "side": "bottom-length_long-back_style_side_vents.png"
+        };
+        
+        // Fix bélés ID egyelőre
+        var LINING_FABRIC_ID = "191";
+        
+        // Lining fájlnevei
+        var LINING_FILES = {
+            "interior_espalda_abajo.png": "interior-espalda_abajo-length_long.png",
+            "interior_espalda_arriba.png": "interior-espalda_arriba.png",
+            "interior_espalda_arriba_mao.png": "interior-espalda_arriba_mao.png"
+        };
+        
+        // Zsebkendő beállítások
+        var handkerchiefEnabled = false;
+        var currentHandkerchiefId = null;
+        
+        // Alapértelmezett stílus
+        var currentStyle = "SB1";
+        
+        // Alapértelmezett anyag ID
+        var currentFabricId = null;
+        
+        // Alapértelmezett zseb típus
+        var currentPocketType = "flap";
+        
+        // Alapértelmezett szellőző típus
+        var currentVentType = "center";
+        
+        // Alapértelmezett nézet (front/back)
+        var currentView = "front";
+        
+        // Alap erőforrás elérési út
+        var baseResourcePath = $("#image-data").data("base-path") + "/Resources";
+        console.log("Erőforrás alap: " + baseResourcePath);
+        
+        // Az sc-stack elem kinyerése
+        var $stack = $(".sc-stack");
+        
+        // Anyagok betöltése JSON-ból
+        $.getJSON(baseResourcePath + "/materials.json", function(data) {
+            console.log("Anyag adatok betöltve", data);
+            
+            // Az anyag választékot dinamikusan feltöltjük
+            var fabricGrid = $("#fabric-grid");
+            
+            $.each(data, function(index, item) {
+                var imageUrl = baseResourcePath + "/scrape/fabric/" + item.id + "_huge_c300.jpg";
+                
+                // Euro árfolyam - 400 Ft/Euro
+                var euroRate = 400;
+                
+                // Ár átalakítása forintra
+                var priceEuro = parseFloat(item.price.replace('€', '').trim());
+                var priceHuf = Math.round(priceEuro * euroRate);
+                
+                var card = $('<figure class="sc-fabric-card" data-id="' + item.id + '" data-price="' + priceHuf + '">' +
+                             '<img loading="lazy" src="' + imageUrl + '" alt="' + item.name + '" />' +
+                             '<figcaption>' + item.name + '</figcaption>' +
+                             '<div class="sc-fabric-details">' + item.details + '</div>' +
+                             '<div class="sc-fabric-price">' + priceHuf + ' Ft</div>' +
+                             '</figure>');
+                
+                fabricGrid.append(card);
+            });
+            
+            // Anyag kártyák eseménykezelője
+            $(".sc-fabric-card").on("click", function() {
+                // Aktív kártya stílus
+                $(".sc-fabric-card").removeClass("is-active");
+                $(this).addClass("is-active");
+                
+                // Kiválasztott anyag ID
+                currentFabricId = $(this).data("id");
+                console.log("Kiválasztott anyag: " + currentFabricId);
+                
+                // Kiválasztott anyag ára
+                currentFabricPrice = $(this).data("price");
+                console.log("Anyag ára: " + currentFabricPrice + " Ft");
+                
+                // Kiválasztott anyag megjelenítése az összegzésben
+                $("#selected-fabric").text($(this).find("figcaption").text());
+                
+                // Váltás elölnézetre
+                currentView = "front";
+                $(".sc-view-toggle span").removeClass("is-active");
+                $(".sc-view-toggle span[data-view='front']").addClass("is-active");
+                
+                // Öltöny frissítése az aktuális anyaggal és stílussal
+                updateSuitLayers(currentFabricId, currentStyle, currentPocketType, currentVentType, currentView);
+                
+                // Ár frissítése
+                updatePrice();
+                
+                // Mobil nézeten automatikusan bezárja a menüt
+                if (window.innerWidth <= 767) {
+                    $(".sc-left-panel").removeClass("active");
+                }
+            });
+            
+            // Alapértelmezetten az első anyagot válasszuk ki
+            if ($(".sc-fabric-card").length > 0) {
+                setTimeout(function() {
+                    console.log("Első anyag kiválasztása");
+                    $(".sc-fabric-card:first").click();
+                }, 300);
+            }
+            
+        }).fail(function(jqxhr, textStatus, error) {
+            console.error("Hiba az anyag adatok betöltésekor:", textStatus, error);
+            
+            // Hiba esetén használhatunk egy alapértelmezett anyagot
+            alert("Nem sikerült betölteni az anyagokat. Kérjük, töltse újra az oldalt.");
+        });
+        
+        // Keresőmező kezelése - egyszerű szűrő az anyagokhoz
+        $(".sc-search").on("input", function() {
+            const searchTerm = $(this).val().toLowerCase();
+            $(".sc-fabric-card").each(function() {
+                const fabricName = $(this).find("figcaption").text().toLowerCase();
+                const fabricDetails = $(this).find(".sc-fabric-details").text().toLowerCase();
+                if (fabricName.includes(searchTerm) || fabricDetails.includes(searchTerm)) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        });
+        
+        // Kép betöltési számláló - globális
+        var loadedImages = 0;
+        var totalImages = 0;
+        
+        // Tovább gomb eseménykezelő
+        $(".sc-next-btn").on("click", function() {
+            alert("A rendelés folytatása funkció hamarosan elérhető lesz.");
+        });
+        
+        // Zsebkendők betöltése JSON-ból
+        $.getJSON(baseResourcePath + "/handkerchiefs.json", function(data) {
+            console.log("Zsebkendő adatok betöltve", data);
+            
+            // A zsebkendő választékot dinamikusan feltöltjük
+            var handkerchiefGrid = $("#handkerchief-grid");
+            
+            $.each(data, function(index, item) {
+                var card = $('<figure class="sc-handkerchief-card" data-id="' + item.id + '">' +
+                             '<img loading="lazy" src="' + baseResourcePath + '/scrape/handkerchief/preview/' + item.id + '_detail_thumb.png" ' + 
+                             'alt="' + item.name + ' zsebkendő" />' +
+                             '<figcaption>' + item.name + '</figcaption>' +
+                             '</figure>');
+                
+                handkerchiefGrid.append(card);
+            });
+            
+            // Zsebkendő kártyák eseménykezelője
+            $(".sc-handkerchief-card").on("click", function() {
+                // Aktív kártya stílus
+                $(".sc-handkerchief-card").removeClass("is-active");
+                $(this).addClass("is-active");
+                
+                // Kiválasztott zsebkendő ID
+                currentHandkerchiefId = $(this).data("id");
+                console.log("Kiválasztott zsebkendő: " + currentHandkerchiefId);
+                
+                // Kiválasztott zsebkendő megjelenítése az összegzésben
+                var handkerchiefName = $(this).find("figcaption").text();
+                $("#selected-handkerchief").text(handkerchiefName + " (+4000 Ft)");
+                
+                // Váltás elölnézetre
+                currentView = "front";
+                $(".sc-view-toggle span").removeClass("is-active");
+                $(".sc-view-toggle span[data-view='front']").addClass("is-active");
+                
+                // Csak akkor frissítsük a rétegeket, ha a zsebkendő opció engedélyezve van
+                if (handkerchiefEnabled && currentFabricId) {
+                    updateSuitLayers(currentFabricId, currentStyle, currentPocketType, currentVentType, currentView);
+                }
+            });
+            
+        }).fail(function(jqxhr, textStatus, error) {
+            console.error("Hiba a zsebkendő adatok betöltésekor:", textStatus, error);
+        });
+        
+        // Stílus változtatás eseménykezelője
+        $(".sc-style-option").on("click", function() {
+            // Aktív stílus kiemelése
+            $(".sc-style-option").removeClass("is-active");
+            $(this).addClass("is-active");
+            
+            // Stílus azonosító kinyerése
+            var styleCode = $(this).data("style");
+            currentStyle = styleCode;
+            
+            // Váltás elölnézetre
+            currentView = "front";
+            $(".sc-view-toggle span").removeClass("is-active");
+            $(".sc-view-toggle span[data-view='front']").addClass("is-active");
+            
+            // Öltöny frissítése az aktuális anyaggal és stílussal
+            if (currentFabricId) {
+                updateSuitLayers(currentFabricId, currentStyle, currentPocketType, currentVentType, currentView);
+            }
+            
+            // Stílus kijelzés frissítése
+            var styleName = "";
+            switch(styleCode) {
+                case "SB1": styleName = "Egysoros (1 gombos)"; break;
+                case "SB2": styleName = "Egysoros (2 gombos)"; break;
+                case "DB4": styleName = "Kétsoros (4 gombos)"; break;
+                case "DB6": styleName = "Kétsoros (6 gombos)"; break;
+                case "MAO": styleName = "Mao gallér"; break;
+            }
+            $("#selected-style").text(styleName);
+        });
+        
+        // Zseb típus változtatás eseménykezelője
+        $(".sc-pocket-option").on("click", function() {
+            // Aktív zseb típus kiemelése
+            $(".sc-pocket-option").removeClass("is-active");
+            $(this).addClass("is-active");
+            
+            // Zseb típus azonosító kinyerése
+            currentPocketType = $(this).data("pocket");
+            console.log("Kiválasztott zseb típus: " + currentPocketType);
+            
+            // Váltás elölnézetre
+            currentView = "front";
+            $(".sc-view-toggle span").removeClass("is-active");
+            $(".sc-view-toggle span[data-view='front']").addClass("is-active");
+            
+            // Öltöny frissítése az aktuális anyaggal, stílussal és zseb típussal
+            if (currentFabricId) {
+                updateSuitLayers(currentFabricId, currentStyle, currentPocketType, currentVentType, currentView);
+            }
+        });
+        
+        // Szellőző típus változtatás eseménykezelője
+        $(".sc-vent-option").on("click", function() {
+            // Aktív szellőző típus kiemelése
+            $(".sc-vent-option").removeClass("is-active");
+            $(this).addClass("is-active");
+            
+            // Szellőző típus azonosító kinyerése
+            currentVentType = $(this).data("vent");
+            console.log("Kiválasztott szellőző típus: " + currentVentType);
+            
+            // Váltás hátulnézetre
+            currentView = "back";
+            $(".sc-view-toggle span").removeClass("is-active");
+            $(".sc-view-toggle span[data-view='back']").addClass("is-active");
+            
+            // Öltöny frissítése az aktuális anyaggal, stílussal, zseb típussal és szellőző típussal
+            if (currentFabricId) {
+                updateSuitLayers(currentFabricId, currentStyle, currentPocketType, currentVentType, currentView);
+            }
+        });
+        
+        // Nézet váltás eseménykezelője
+        $(".sc-view-toggle span").on("click", function() {
+            // Aktív nézet kiemelése
+            $(".sc-view-toggle span").removeClass("is-active");
+            $(this).addClass("is-active");
+            
+            // Nézet típus azonosító kinyerése
+            currentView = $(this).data("view");
+            console.log("Kiválasztott nézet: " + currentView);
+            
+            // Öltöny frissítése az aktuális anyaggal, stílussal, zseb típussal és szellőző típussal
+            if (currentFabricId) {
+                updateSuitLayers(currentFabricId, currentStyle, currentPocketType, currentVentType, currentView);
+            }
+        });
+        
+        // Zsebkendő opció eseménykezelője
+        $(".sc-handkerchief-option").on("click", function() {
+            // Aktív opció kiemelése
+            $(".sc-handkerchief-option").removeClass("is-active");
+            $(this).addClass("is-active");
+            
+            // Opció érték kinyerése
+            var option = $(this).data("value");
+            console.log("Zsebkendő opció: " + option);
+            
+            // Váltás elölnézetre
+            currentView = "front";
+            $(".sc-view-toggle span").removeClass("is-active");
+            $(".sc-view-toggle span[data-view='front']").addClass("is-active");
+            
+            // Zsebkendő rács megjelenítése/elrejtése
+            if (option === "yes") {
+                $(".sc-handkerchief-grid").removeClass("hidden");
+                handkerchiefEnabled = true;
+                $("#selected-handkerchief").text("Kérek (+4000 Ft)");
+                
+                // Ha korábban már választottak zsebkendőt, használjuk azt
+                if (currentHandkerchiefId) {
+                    updateSuitLayers(currentFabricId, currentStyle, currentPocketType, currentVentType, currentView);
+                } else {
+                    // Válasszuk ki az elsőt alapértelmezetten, ha van
+                    if ($(".sc-handkerchief-card").length > 0) {
+                        $(".sc-handkerchief-card:first").click();
+                    }
+                }
+            } else {
+                $(".sc-handkerchief-grid").addClass("hidden");
+                handkerchiefEnabled = false;
+                $("#selected-handkerchief").text("Nem kérek");
+                
+                // Frissítsük az öltönyt zsebkendő nélkül
+                if (currentFabricId) {
+                    updateSuitLayers(currentFabricId, currentStyle, currentPocketType, currentVentType, currentView);
+                }
+            }
+            
+            // Ár frissítése a zsebkendő opció alapján
+            updatePrice();
+        });
+        
+        // Ár frissítése
+        function updatePrice() {
+            var totalPrice = 0;
+            
+            // Anyag ára
+            if (currentFabricPrice) {
+                totalPrice += currentFabricPrice;
+            }
+            
+            // Ha a zsebkendő opció be van kapcsolva, adjunk hozzá 4000 Ft-ot
+            if (handkerchiefEnabled) {
+                totalPrice += 4000;
+            }
+            
+            // Frissítsük a megjelenített árat
+            $(".sc-price").text(totalPrice + " Ft");
+            
+            // A kiválasztott anyag nevét és árát megjelenítjük az összegzésben
+            var fabricName = $(".sc-fabric-card.is-active figcaption").text();
+            if (fabricName && currentFabricPrice) {
+                $("#selected-fabric").text(fabricName + " (" + currentFabricPrice + " Ft)");
+            }
+        }
+        
+        // Öltöny rétegek frissítése
+        function updateSuitLayers(fabricId, styleCode, pocketType, ventType, viewType) {
+            console.log("Öltöny rétegek frissítése: Anyag=" + fabricId + ", Stílus=" + styleCode + 
+                        ", Zseb=" + pocketType + ", Szellőző=" + ventType + ", Nézet=" + viewType);
+            
+            // Töltés kijelzése
+            showLoading();
+            $(".sc-stack").css("visibility", "hidden");
+            
+            // Távolítsuk el a régi rétegeket
+            $(".sc-stack").empty();
+            
+            // Kiválasztott stílus
+            var style = SUIT_STYLES[styleCode];
+            if (!style) {
+                console.error("Ismeretlen stílus kód: " + styleCode);
+                hideLoading();
+                return;
+            }
+            
+            // Alap útvonalak
+            var baseFolderPath = viewType === "front" ? "front" : "back";
+            var jacketBasePath = baseResourcePath + "/scrape/jacket/" + fabricId + "_fabric/" + baseFolderPath + "/";
+            var liningBasePath = baseResourcePath + "/scrape/linings/" + LINING_FABRIC_ID + "_fabric/" + baseFolderPath + "/";
+            
+            console.log("Kabát útvonal: " + jacketBasePath);
+            console.log("Bélés útvonal: " + liningBasePath);
+            console.log("Nézet: " + viewType);
+            
+            // Betöltési állapot számláló resetelése
+            loadedImages = 0;
+            
+            // Különböző összetételek elöl- és hátulnézetben
+            if (viewType === "front") {
+                totalImages = 9; // 9 réteg elölről
+                
+                try {
+                    // Minden használt kép eltávolítása a DOM-ból és az emlékezetből
+                    $stack.find("img").off().remove();
+                    
+                    // 1. Bélés alsó réteg - espalda_abajo (közvetlen fájlnévet használunk)
+                    addLayerImageDirect(liningBasePath, "interior-espalda_abajo-length_long.png", 10, "bélés alul");
+                    
+                    // 2. Bélés felső réteg - espalda_arriba (eltérő mandarin stílusnál)
+                    var topLiningImg = styleCode === "MAO" ? 
+                        "interior-espalda_arriba_mao.png" : 
+                        "interior-espalda_arriba.png";
+                        
+                    console.log("Bélés felső réteg: " + topLiningImg);
+                    addLayerImageDirect(liningBasePath, topLiningImg, 20, "bélés felül");
+                    
+                    // 2.5 Bélés felső réteg a jacket mappából is (a nyak tetejénél)
+                    console.log("Jacket bélés felső réteg betöltése: " + topLiningImg);
+                    addLayerImageDirect(jacketBasePath, topLiningImg, 25, "jacket bélés felül");
+                    
+                    // 3. Bélés ujjak (jacket mappából)
+                    addLayerImage(jacketBasePath, "interior_sleeves.png", 30, "bélés ujjak");
+                    
+                    // 4. Kabát alapja - bottom
+                    addLayerImage(jacketBasePath, style.bottom, 40, "kabát alja");
+                    
+                    // 5. Nyak/gallér - neck
+                    addLayerImage(jacketBasePath, style.neck, 50, "gallér");
+                    
+                    // 6. Mellzseb - breast_pocket
+                    addLayerImage(jacketBasePath, style.breast_pocket, 60, "mellzseb");
+                    
+                    // 7. Csípőzseb - a kiválasztott zseb típus alapján
+                    var pocketFileName = POCKET_TYPES[pocketType] || POCKET_TYPES["flap"];
+                    addLayerImageDirect(jacketBasePath, pocketFileName, 70, "csípőzseb");
+                    
+                    // 8. Ujjak - sleeves (legfelső réteg)
+                    addLayerImage(jacketBasePath, "sleeves.png", 80, "ujjak");
+                    
+                    // 9. Zsebkendő (ha kell)
+                    if (handkerchiefEnabled && currentHandkerchiefId) {
+                        addLayerImageDirect(baseResourcePath + "/scrape/handkerchief/", currentHandkerchiefId + ".png", 90, "zsebkendő");
+                        totalImages++;
+                    }
+                } catch (e) {
+                    console.error("Hiba történt az elölnézet betöltése közben: ", e);
+                    hideLoading();
+                }
+            } else { // Hátulnézet
+                totalImages = 3; // 3 réteg hátulról
+                
+                try {
+                    // Minden használt kép eltávolítása a DOM-ból és az emlékezetből
+                    $stack.find("img").off().remove();
+                    
+                    // 1. Kabát alja - a kiválasztott szellőző típussal
+                    var ventFileName = VENT_TYPES[ventType] || VENT_TYPES["center"];
+                    addLayerImageDirect(jacketBasePath, ventFileName, 10, "kabát hátulja a szellőzővel");
+                    
+                    // 2. Nyak rész
+                    addLayerImageDirect(jacketBasePath, "neck.png", 20, "nyak hátulja");
+                    
+                    // 3. Ujjak
+                    addLayerImageDirect(jacketBasePath, "sleeves-buttons_3.png", 30, "ujjak hátulja");
+                } catch (e) {
+                    console.error("Hiba történt a hátulnézet betöltése közben: ", e);
+                    hideLoading();
+                }
+            }
+        }
+        
+        // Alternatív fájlnév átalakítása a - karakteres variációra
+        function getActualFilename(alternativeName) {
+            return FILE_MAPPINGS[alternativeName] || alternativeName;
+        }
+        
+        // Segédfüggvény egy réteg kép közvetlen hozzáadásához (fájlnév átalakítás nélkül)
+        function addLayerImageDirect(basePath, fileName, zIndex, name) {
+            // Egyszerű URL összeállítás - Ellenőrizzük, hogy a basePath / karakterre végződik-e
+            if (basePath.substr(-1) !== '/') {
+                basePath = basePath + '/';
+            }
+            var fullSrc = basePath + fileName;
+            
+            console.log("Réteg közvetlen hozzáadása: " + name + " (z-index: " + zIndex + ")");
+            console.log("  Fájlnév: " + fileName);
+            console.log("  Teljes URL: " + fullSrc);
+            
+            // Új kép elem létrehozása
+            var $img = $("<img>")
+                .attr("src", fullSrc)
+                .attr("alt", name)
+                .attr("title", name) // Tooltip a hibakereséshez
+                .css({
+                    "position": "absolute",
+                    "top": "0",
+                    "left": "0",
+                    "width": "100%",
+                    "height": "auto",
+                    "z-index": zIndex,
+                    "border": "0" // Eltávolítjuk a lehetséges határvonalakat
+                });
+            
+            // Kép betöltési eseménykezelők
+            $img.on("load", function() {
+                console.log("✅ Betöltve: " + name + " - " + fullSrc);
+                checkAllImagesLoaded();
+            });
+            
+            $img.on("error", function() {
+                console.error("❌ Hiba a betöltésnél: " + name + " (" + fullSrc + ")");
+                $(this).hide(); // Hibás kép elrejtése
+                checkAllImagesLoaded();
+            });
+            
+            // Kép hozzáadása a konténerhez
+            $stack.append($img);
+        }
+        
+        // Segédfüggvény egy réteg kép hozzáadásához
+        function addLayerImage(basePath, fileName, zIndex, name) {
+            // A valódi fájlnév (- karakterekkel)
+            var actualFileName = getActualFilename(fileName);
+            
+            // Bélés elérési útja esetén a LINING_FILES objektumot használjuk
+            if (basePath.indexOf("/linings/") !== -1) {
+                if (LINING_FILES[fileName]) {
+                    actualFileName = LINING_FILES[fileName];
+                    console.log("  Bélés fájl átírva: " + fileName + " → " + actualFileName);
+                } else {
+                    console.log("  Figyelem: Bélés fájl nincs a leképezésben: " + fileName);
+                }
+            }
+            
+            // Egyszerű URL összeállítás - Ellenőrizzük, hogy a basePath / karakterre végződik-e
+            if (basePath.substr(-1) !== '/') {
+                basePath = basePath + '/';
+            }
+            var fullSrc = basePath + actualFileName;
+            
+            console.log("Réteg hozzáadása: " + name + " (z-index: " + zIndex + ")");
+            console.log("  Fájlnév: " + fileName + " → " + actualFileName);
+            console.log("  Teljes URL: " + fullSrc);
+            
+            // Új kép elem létrehozása
+            var $img = $("<img>")
+                .attr("src", fullSrc)
+                .attr("alt", name)
+                .attr("title", name) // Tooltip a hibakereséshez
+                .css({
+                    "position": "absolute",
+                    "top": "0",
+                    "left": "0",
+                    "width": "100%",
+                    "height": "auto",
+                    "z-index": zIndex,
+                    "border": "0" // Eltávolítjuk a lehetséges határvonalakat
+                });
+            
+            // Kép betöltési eseménykezelők
+            $img.on("load", function() {
+                console.log("✅ Betöltve: " + name + " - " + fullSrc);
+                checkAllImagesLoaded();
+            });
+            
+            $img.on("error", function() {
+                console.error("❌ Hiba a betöltésnél: " + name + " (" + fullSrc + ")");
+                
+                // Eredeti fájlnévvel próbáljuk még egyszer 
+                // (hátha a mapping hibás és az eredeti a jó)
+                if (fileName !== actualFileName) {
+                    console.log("⚠️ Újrapróbálkozás eredeti fájlnévvel: " + fileName);
+                    var retryImg = $("<img>")
+                        .attr("src", basePath + fileName)
+                        .attr("alt", name)
+                        .attr("title", name + " (retry)")
+                        .css({
+                            "position": "absolute",
+                            "top": "0",
+                            "left": "0",
+                            "width": "100%",
+                            "height": "auto",
+                            "z-index": zIndex,
+                            "border": "0"
+                        });
+                    
+                    retryImg.on("load", function() {
+                        console.log("✅ Második próbálkozás sikerült: " + name);
+                        checkAllImagesLoaded();
+                    });
+                    
+                    retryImg.on("error", function() {
+                        console.error("💔 Második próbálkozás is sikertelen: " + name);
+                        $(this).hide();
+                        checkAllImagesLoaded();
+                    });
+                    
+                    $stack.append(retryImg);
+                } else {
+                    $(this).hide(); // Hibás kép elrejtése
+                    checkAllImagesLoaded();
+                }
+            });
+            
+            // Kép hozzáadása a konténerhez
+            $stack.append($img);
+        }
+        
+        // Ellenőrzi, hogy minden kép betöltődött-e már
+        function checkAllImagesLoaded() {
+            loadedImages++;
+            if (loadedImages >= totalImages) {
+                console.log("✅✅✅ Minden réteg betöltve vagy megpróbálva");
+                // Betöltés után rögtön megjelenítjük a képet, animáció nélkül
+                $stack.css("visibility", "visible").css("transform", `translateY(5%) scale(${zoomLevel})`);
+                hideLoading();
+            }
+        }
+        
+        // WCAG kompatibilitás - klaviatúrakezelés
+        $(".sc-fabric-card, .sc-style-option, .sc-tab, .sc-zoom-btn, .sc-next-btn").on("keydown", function(e) {
+            if (e.keyCode === 13 || e.keyCode === 32) {
+                e.preventDefault();
+                $(this).click();
+            }
+        });
+        
+        // Ablakméret változás kezelése
+        $(window).on("resize", function() {
+            if (window.innerWidth > 767 && $(".sc-left-panel").hasClass("active")) {
+                $(".sc-left-panel").removeClass("active");
+            }
+        });
+    });
+</script>

@@ -1,0 +1,176 @@
+@using DotNetNuke.Web.Mvc.Helpers
+@using System.Web.Mvc.Html
+@{
+    Layout = "~/DesktopModules/YourRFProject/module-suitcustomizer/Dnn.Team5050.SuitCustomizer/Views/Shared/_Layout.cshtml";
+    var configuration = ViewBag.Configuration as SuitCustomizer.Dnn.Dnn.Team5050.SuitCustomizer.Models.SuitCartItem;
+    
+    // Előre generáljuk a szükséges adatokat
+    var fabricId = ViewBag.FabricId;
+    var style = ViewBag.Style;
+    var price = ViewBag.Price;
+    var hotcakesProductId = ViewBag.HotcakesProductId;
+    
+    // Adatok előkészítése
+    var fabricName = configuration != null ? configuration.FabricName : "";
+    var lapel = configuration != null ? configuration.Lapel : "";
+    var buttons = configuration != null ? configuration.Buttons.ToString() : "";
+    var handkerchiefOption = configuration != null ? configuration.HandkerchiefOption : "";
+    var handkerchiefId = configuration != null ? (configuration.HandkerchiefId ?? "") : "";
+    var handkerchiefName = configuration != null ? (configuration.HandkerchiefName ?? "") : "";
+    var snapshotUrl = configuration != null ? configuration.SnapshotUrl : "";
+}
+
+<div class="sc-order-complete">
+    <h2>Kosárba helyezés folyamatban...</h2>
+    <div class="sc-loading">
+        <div class="spinner"></div>
+        <p>Kérjük várjon, amíg elkészítjük az egyedi öltönyét és a kosárba helyezzük...</p>
+    </div>
+    
+    <div class="sc-order-details" style="display:none;">
+        <h3>Az Ön egyedi öltönye</h3>
+        <p><strong>Anyag azonosító:</strong> @fabricId (@fabricName)</p>
+        <p><strong>Stílus:</strong> @style</p>
+        <p><strong>Gombok:</strong> @buttons</p>
+        <p><strong>Gallér:</strong> @lapel</p>
+        <p><strong>Ár:</strong> @price Ft</p>
+        
+        @if (!string.IsNullOrEmpty(handkerchiefId))
+        {
+            <p><strong>Zsebkendő:</strong> @handkerchiefName</p>
+        }
+    </div>
+</div>
+
+<style>
+    .sc-order-complete {
+        text-align: center;
+        padding: 40px;
+    }
+    
+    .sc-loading {
+        margin: 30px 0;
+    }
+    
+    .spinner {
+        margin: 0 auto;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #3498db;
+        /* Egyszerű CSS helyett a JavaScript fogja animálni */
+    }
+    
+    .sc-order-details {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .sc-order-details p {
+        margin: 10px 0;
+        text-align: left;
+    }
+</style>
+
+<script>
+    $(document).ready(function() {
+        // Spinner egyszerű animálása JavaScript-tel keyframes helyett
+        var spinnerAngle = 0;
+        var spinnerInterval = setInterval(function() {
+            spinnerAngle += 10;
+            if (spinnerAngle >= 360) spinnerAngle = 0;
+            $(".spinner").css("transform", "rotate(" + spinnerAngle + "deg)");
+        }, 50);
+        
+        // Adatok kinyerése
+        var fabricId = "@fabricId";
+        var style = "@style";
+        var price = "@price";
+        var productId = "@hotcakesProductId" || "SUIT-CUSTOM-BASE";
+        
+        // További adatok
+        var fabricName = "@fabricName";
+        var lapel = "@lapel";
+        var buttons = "@buttons";
+        var handkerchiefOption = "@handkerchiefOption";
+        var handkerchiefId = "@handkerchiefId";
+        var handkerchiefName = "@handkerchiefName";
+        var snapshotUrl = "@snapshotUrl";
+        
+        // Az options objektum építése
+        var options = {
+            FabricId: parseInt(fabricId) || 0,
+            Style: style || "",
+            CustomPrice: parseFloat(price) || 0
+        };
+        
+        // Csak akkor adjuk hozzá, ha nem üres
+        if (lapel) options.Lapel = lapel;
+        if (buttons) options.Buttons = parseInt(buttons) || 0;
+        if (fabricName) options.FabricName = fabricName;
+        if (handkerchiefOption) options.HandkerchiefOption = handkerchiefOption;
+        if (handkerchiefId) options.HandkerchiefId = handkerchiefId;
+        if (handkerchiefName) options.HandkerchiefName = handkerchiefName;
+        if (snapshotUrl) options.SnapshotUrl = snapshotUrl;
+        
+        // Adat objektum készítése
+        var cartData = {
+            productId: productId,
+            quantity: 1,
+            price: parseFloat(price) || 0,
+            options: JSON.stringify(options)
+        };
+        
+        console.log("Kosárba tétel adatok:", cartData);
+        
+        // 1 másodperces késleltetés után küldjük a kérést
+        setTimeout(function() {
+            // Hotcakes API kérés
+            $.ajax({
+                type: "POST",
+                url: "/DesktopModules/Hotcakes/API/cart/addproduct",
+                data: cartData,
+                success: function(response) {
+                    console.log("Sikeres kosárba tétel:", response);
+                    
+                    // Leállítjuk a spinner animációt
+                    clearInterval(spinnerInterval);
+                    
+                    // Megjelenítjük a részleteket
+                    $(".sc-loading").fadeOut(function() {
+                        $(".sc-order-details").fadeIn();
+                        
+                        // 2 másodperc után átirányítás
+                        setTimeout(function() {
+                            window.location.href = "/store/cart";
+                        }, 2000);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Kosárba helyezési hiba:", error);
+                    console.log("Hibás válasz:", xhr.responseText);
+                    
+                    // Leállítjuk a spinner animációt
+                    clearInterval(spinnerInterval);
+                    
+                    // Megjelenítjük a részleteket és egy gombot
+                    $(".sc-loading").fadeOut(function() {
+                        $(".sc-order-details").fadeIn();
+                        $(".sc-order-details").append(
+                            '<div class="sc-cart-button" style="margin-top: 20px;">' +
+                            '<p>Kérjük, próbálja meg később újra.</p>' +
+                            '<a href="/store/cart" class="btn btn-primary">Tovább a kosárhoz</a>' +
+                            '</div>'
+                        );
+                    });
+                }
+            });
+        }, 1000);
+    });
+</script> 

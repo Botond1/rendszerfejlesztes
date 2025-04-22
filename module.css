@@ -1,0 +1,380 @@
+/* ---- Suit Customizer (Team5050) ---- */
+:root {
+    --primary-color: #222222;
+    --accent-color: #f77f00;
+    --light-gray: #f5f5f5;
+    --border-color: #dddddd;
+    --text-color: #333333;
+    --active-tab: #f8f8f8;
+}
+
+.sc-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-color);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Main sections */
+.sc-sidebar {
+    width: 300px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--border-color);
+    background-color: white;
+    height: 100vh;
+    overflow-y: auto;
+    position: relative;
+    z-index: 2;
+}
+
+.sc-preview-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    min-height: 80vh;
+    padding: 20px;
+    position: relative;
+}
+
+/* Configuration Tabs */
+.sc-config-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+}
+
+.sc-tab {
+    padding: 15px 20px;
+    cursor: pointer;
+    font-weight: 500;
+    text-align: center;
+    flex: 1;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.sc-tab:hover {
+    background-color: var(--light-gray);
+}
+
+.sc-tab.active {
+    border-bottom-color: var(--accent-color);
+    background-color: var(--active-tab);
+}
+
+.sc-tab-icon {
+    display: block;
+    margin: 0 auto 8px;
+    height: 24px;
+    width: 24px;
+}
+
+/* Tab content containers */
+.sc-tab-content {
+    display: none;
+    padding: 15px;
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+}
+
+.sc-tab-content.active {
+    display: block;
+}
+
+/* Fabric Grid */
+.sc-fabric-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.sc-fabric-card {
+    border: 2px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    background: white;
+    transition: all 0.2s ease;
+    text-align: center;
+    font-size: .8rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.sc-fabric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.sc-fabric-card.is-active {
+    border-color: var(--accent-color);
+}
+
+.sc-fabric-card img {
+    width: 100%;
+    border-radius: 2px 2px 0 0;
+    display: block;
+}
+
+.sc-fabric-card figcaption {
+    padding: 8px 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Style Selector */
+.sc-style-selector {
+    margin-bottom: 20px;
+}
+
+.sc-style-selector h3 {
+    font-size: 1rem;
+    margin-bottom: 15px;
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.sc-style-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.sc-style-option {
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    background: white;
+    transition: all 0.2s ease;
+    text-align: center;
+    font-size: .75rem;
+    padding: 10px 5px;
+}
+
+.sc-style-option:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.sc-style-option.is-active {
+    border-color: var(--accent-color);
+    background-color: rgba(247, 127, 0, 0.05);
+}
+
+.sc-style-option .style-icon {
+    height: 50px;
+    margin-bottom: 8px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+/* Öltöny stílus ikonok */
+.style-sb1 {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 60'%3E%3Cpath fill='%23e6e6e6' stroke='%23333' stroke-width='1' d='M15,5 L8,15 L10,55 L25,58 L40,55 L42,15 L35,5 L25,10 z'/%3E%3Ccircle cx='25' cy='32' r='2' fill='%23333'/%3E%3C/svg%3E");
+}
+
+.style-sb2 {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 60'%3E%3Cpath fill='%23e6e6e6' stroke='%23333' stroke-width='1' d='M15,5 L8,15 L10,55 L25,58 L40,55 L42,15 L35,5 L25,10 z'/%3E%3Ccircle cx='25' cy='28' r='1.5' fill='%23333'/%3E%3Ccircle cx='25' cy='36' r='1.5' fill='%23333'/%3E%3C/svg%3E");
+}
+
+.style-db4 {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 60'%3E%3Cpath fill='%23e6e6e6' stroke='%23333' stroke-width='1' d='M15,5 L8,15 L10,55 L25,58 L40,55 L42,15 L35,5 L25,12 z'/%3E%3Ccircle cx='23' cy='28' r='1.5' fill='%23333'/%3E%3Ccircle cx='23' cy='36' r='1.5' fill='%23333'/%3E%3Ccircle cx='29' cy='28' r='1.5' fill='%23333'/%3E%3Ccircle cx='29' cy='36' r='1.5' fill='%23333'/%3E%3C/svg%3E");
+}
+
+.style-db6 {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 60'%3E%3Cpath fill='%23e6e6e6' stroke='%23333' stroke-width='1' d='M15,5 L8,15 L10,55 L25,58 L40,55 L42,15 L35,5 L25,12 z'/%3E%3Ccircle cx='22' cy='24' r='1.2' fill='%23333'/%3E%3Ccircle cx='22' cy='30' r='1.2' fill='%23333'/%3E%3Ccircle cx='22' cy='36' r='1.2' fill='%23333'/%3E%3Ccircle cx='28' cy='24' r='1.2' fill='%23333'/%3E%3Ccircle cx='28' cy='30' r='1.2' fill='%23333'/%3E%3Ccircle cx='28' cy='36' r='1.2' fill='%23333'/%3E%3C/svg%3E");
+}
+
+.style-mao {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 60'%3E%3Cpath fill='%23e6e6e6' stroke='%23333' stroke-width='1' d='M15,5 L8,15 L10,55 L25,58 L40,55 L42,15 L35,5 L25,5 z'/%3E%3Cpath fill='none' stroke='%23333' stroke-width='1' d='M22,15 L22,25 M28,15 L28,25'/%3E%3C/svg%3E");
+}
+
+.sc-style-option div {
+    line-height: 1.2;
+    font-size: 0.75rem;
+}
+
+/* Öltöny előnézet */
+.sc-preview {
+    width: 100%; 
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sc-stack {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    height: 700px;
+    margin: 0 auto;
+}
+
+.sc-stack img {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    pointer-events: none;
+    transform: translateZ(0); 
+    backface-visibility: hidden;
+}
+
+/* Order details panel */
+.sc-order-details {
+    background-color: white;
+    padding: 20px;
+    width: 100%;
+    max-width: 600px;
+    margin-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.sc-price {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    text-align: right;
+}
+
+.sc-order-text {
+    color: #666;
+    font-size: 0.9rem;
+    text-align: right;
+    margin-bottom: 15px;
+}
+
+.sc-next-btn {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    float: right;
+    transition: background-color 0.2s;
+    font-weight: 500;
+}
+
+.sc-next-btn:hover {
+    background-color: #e07000;
+}
+
+/* Responsive design */
+@media screen and (max-width: 1024px) {
+    .sc-container {
+        flex-direction: column;
+    }
+    
+    .sc-sidebar {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .sc-tab-content {
+        height: auto;
+        max-height: 50vh;
+    }
+    
+    .sc-preview-container {
+        min-height: auto;
+    }
+    
+    .sc-stack {
+        height: 500px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .sc-fabric-grid,
+    .sc-style-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .sc-config-tabs {
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    
+    .sc-stack {
+        height: 400px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .sc-fabric-grid,
+    .sc-style-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .sc-stack {
+        height: 350px;
+    }
+    
+    .sc-tab {
+        padding: 10px;
+        font-size: 0.8rem;
+    }
+    
+    .sc-next-btn {
+        width: 100%;
+        padding: 10px;
+    }
+}
+
+/* Zseb opciók */
+.sc-pocket-options {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 0 16px 16px 16px;
+}
+
+.sc-pocket-option {
+    padding: 10px 15px;
+    border-radius: 4px;
+    background-color: #F5F7F9;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid #E4E6E8;
+    flex: 1;
+    min-width: 100px;
+    text-align: center;
+}
+
+.sc-pocket-option:hover {
+    background-color: #EDF0F5;
+}
+
+.sc-pocket-option.is-active {
+    background-color: #EDF0F5;
+    border-color: #0066CC;
+    box-shadow: 0 0 0 1px #0066CC;
+}
+
+/* Zseb nevek */
+.pocket-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+}
