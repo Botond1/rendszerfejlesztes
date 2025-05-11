@@ -1,0 +1,13 @@
+C:\DotNetNuke\Dev\DesktopModules\bin\Dnn.Team5050.SuitCustomizer.dll.config
+C:\DotNetNuke\Dev\DesktopModules\bin\Dnn.Team5050.SuitCustomizer.dll
+C:\DotNetNuke\Dev\DesktopModules\bin\Dnn.Team5050.SuitCustomizer.pdb
+C:\DotNetNuke\Dev\DesktopModules\YourRFProject\module-suitcustomizer\Dnn.Team5050.SuitCustomizer\obj\Release\Dnn.Team5050.SuitCustomizer.csproj.AssemblyReference.cache
+C:\DotNetNuke\Dev\DesktopModules\YourRFProject\module-suitcustomizer\Dnn.Team5050.SuitCustomizer\obj\Release\SuitCustomizer.Dnn.Dnn.Team5050.SuitCustomizer.App_LocalResources.Settings.resources
+C:\DotNetNuke\Dev\DesktopModules\YourRFProject\module-suitcustomizer\Dnn.Team5050.SuitCustomizer\obj\Release\Dnn.Team5050.SuitCustomizer.csproj.GenerateResource.cache
+C:\DotNetNuke\Dev\DesktopModules\YourRFProject\module-suitcustomizer\Dnn.Team5050.SuitCustomizer\obj\Release\Dnn.Team5050.SuitCustomizer.csproj.CoreCompileInputs.cache
+C:\DotNetNuke\Dev\DesktopModules\YourRFProject\module-suitcustomizer\Dnn.Team5050.SuitCustomizer\obj\Release\Dnn.Team.80577A96.Up2Date
+C:\DotNetNuke\Dev\DesktopModules\YourRFProject\module-suitcustomizer\Dnn.Team5050.SuitCustomizer\obj\Release\Dnn.Team5050.SuitCustomizer.dll
+C:\DotNetNuke\Dev\DesktopModules\YourRFProject\module-suitcustomizer\Dnn.Team5050.SuitCustomizer\obj\Release\Dnn.Team5050.SuitCustomizer.pdb
+C:\DotNetNuke\Dev\DesktopModules\bin\Magick.Native-Q8-arm64.dll
+C:\DotNetNuke\Dev\DesktopModules\bin\Magick.Native-Q8-x64.dll
+C:\DotNetNuke\Dev\DesktopModules\bin\Magick.Native-Q8-x86.dll

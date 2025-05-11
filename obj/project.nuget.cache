@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "2Ie/NohjO/c=",
+  "success": true,
+  "projectFilePath": "C:\\DotNetNuke\\Dev\\DesktopModules\\YourRFProject\\module-suitcustomizer\\Dnn.Team5050.SuitCustomizer\\Dnn.Team5050.SuitCustomizer.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\smallbotond\\.nuget\\packages\\magick.net-q8-anycpu\\13.3.0\\magick.net-q8-anycpu.13.3.0.nupkg.sha512",
+    "C:\\Users\\smallbotond\\.nuget\\packages\\magick.net.core\\13.3.0\\magick.net.core.13.3.0.nupkg.sha512"
+  ],
+  "logs": []
+}
