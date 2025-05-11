@@ -10,7 +10,7 @@ namespace SuitCustomizer.Dnn.Dnn.Team5050.SuitCustomizer.Models
     [TableName("SuitCustomizer_Fabrics")]
     [PrimaryKey("FabricId", AutoIncrement = true)]
     [Cacheable("Fabrics", CacheItemPriority.Default, 20)]
-    //
+   
     public class Fabric
     {
         public int FabricId { get; set; } = -1;
