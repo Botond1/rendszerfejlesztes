@@ -1390,7 +1390,87 @@
         
         // Tovább gomb eseménykezelő
         $(".sc-next-btn").on("click", function() {
-            alert("A rendelés folytatása funkció hamarosan elérhető lesz.");
+            // Ellenőrizzük, hogy van-e kiválasztott anyag
+            if (!currentFabricId) {
+                alert("Kérjük válasszon anyagot az öltönyhöz!");
+                return;
+            }
+            
+            // SKU kódok meghatározása a kiválasztott elemek alapján
+            var fabricSku = "K-" + currentFabricId; // Az anyag SKU K- előtaggal + anyag ID
+            
+            // Stílus SKU meghatározása
+            var styleSku = "";
+            switch(currentStyle) {
+                case "SB1": styleSku = "K-SUIT1"; break; // Egysoros, 1 gombos
+                case "SB2": styleSku = "K-SUIT2"; break; // Egysoros, 2 gombos
+                case "DB4": styleSku = "K-SUIT3"; break; // Kétsoros, 4 gombos
+                case "DB6": styleSku = "K-SUIT4"; break; // Kétsoros, 6 gombos
+                case "MAO": styleSku = "K-SUIT5"; break; // Mao gallér, 2 gombos
+            }
+            
+            // Zseb típus SKU meghatározása
+            var pocketSku = "";
+            switch(currentPocketType) {
+                case "flap": pocketSku = "K-POCK1"; break; // Fedeles zseb
+                case "patched": pocketSku = "K-POCK2"; break; // Rátett zseb
+                case "double_welt": pocketSku = "K-POCK3"; break; // Dupla paspolos zseb
+            }
+            
+            // Szellőző típus SKU meghatározása
+            var ventSku = "";
+            switch(currentVentType) {
+                case "center": ventSku = "K-VENT1"; break; // Közép szellőző
+                case "side": ventSku = "K-VENT2"; break; // Oldal szellőző
+            }
+            
+            // Termék nevek meghatározása
+            var styleName = "";
+            switch(currentStyle) {
+                case "SB1": styleName = "Egysoros (1 gombos)"; break;
+                case "SB2": styleName = "Egysoros (2 gombos)"; break;
+                case "DB4": styleName = "Kétsoros (4 gombos)"; break;
+                case "DB6": styleName = "Kétsoros (6 gombos)"; break;
+                case "MAO": styleName = "Mao gallér"; break;
+            }
+            
+            var pocketName = "";
+            switch(currentPocketType) {
+                case "flap": pocketName = "Fedeles zseb"; break;
+                case "patched": pocketName = "Rátett zseb"; break;
+                case "double_welt": pocketName = "Dupla paspolos zseb"; break;
+            }
+            
+            var ventName = "";
+            switch(currentVentType) {
+                case "center": ventName = "Közép szellőző"; break;
+                case "side": ventName = "Oldal szellőző"; break;
+            }
+            
+            // Kosárba teendő termékek
+            var cartProducts = [
+                { sku: fabricSku, qty: 1, name: "Öltöny anyag: " + $("#selected-fabric").text() },
+                { sku: styleSku, qty: 1, name: "Öltöny stílus: " + styleName },
+                { sku: pocketSku, qty: 1, name: "Zseb típus: " + pocketName },
+                { sku: ventSku, qty: 1, name: "Szellőző típus: " + ventName }
+            ];
+            
+            // Ha zsebkendő opció engedélyezve van és ki van választva zsebkendő, azt is hozzáadjuk
+            if (handkerchiefEnabled && currentHandkerchiefId) {
+                var handkerchiefName = $("#selected-handkerchief").text().replace(" (+4000 Ft)", "");
+                cartProducts.push({ 
+                    sku: "K-" + currentHandkerchiefId, 
+                    qty: 1, 
+                    name: "Zsebkendő: " + handkerchiefName
+                });
+            }
+            
+            // Többtermék kosárba helyezés URL létrehozása
+            var skus = cartProducts.map(item => item.sku).join(',');
+            var qtys = cartProducts.map(item => item.qty).join(',');
+            
+            // URL létrehozása és átirányítás
+            window.location.href = "http://dnndev.me/HotcakesStore/Kosar?AddSku=" + skus + "&AddSkuQty=" + qtys;
         });
         
         // Zsebkendők betöltése JSON-ból

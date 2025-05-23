@@ -14,6 +14,11 @@ using System.Collections.Generic;
 using DotNetNuke.Data;
 using DotNetNuke.Framework;
 using SuitCustomizer.Dnn.Dnn.Team5050.SuitCustomizer.Models;
+using Hotcakes.CommerceDTO;
+using Hotcakes.CommerceDTO.v1;
+using Hotcakes.CommerceDTO.v1.Client;
+using Hotcakes.CommerceDTO.v1.Catalog;
+
 
 namespace SuitCustomizer.Dnn.Dnn.Team5050.SuitCustomizer.Components
 {
@@ -89,4 +94,8 @@ namespace SuitCustomizer.Dnn.Dnn.Team5050.SuitCustomizer.Components
             return () => new ItemManager();
         }
     }
+
+    
+
+    
 }

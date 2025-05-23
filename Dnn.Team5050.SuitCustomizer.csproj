@@ -60,6 +60,18 @@
       <HintPath>..\..\..\bin\Microsoft.ApplicationBlocks.Data.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Hotcakes.CommerceDTO">
+      <HintPath>bin\Hotcakes.CommerceDTO.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Hotcakes.Commerce">
+      <HintPath>bin\Hotcakes.Commerce.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Hotcakes.Web">
+      <HintPath>bin\Hotcakes.Web.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
